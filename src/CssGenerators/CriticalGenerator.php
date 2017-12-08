@@ -122,7 +122,7 @@ class CriticalGenerator implements CssGeneratorInterface
                 sprintf('Error processing URI [%s]. This is probably caused by '.
                         'the Critical npm package. Checklist: 1) `critical_bin`'.
                         ' is correct, 2) `css` paths are correct 3) run `npm '.
-                        'install` again.', $uri)
+                        'install` again.[%s][%s]', $uri, PHP_EOL, $process->getErrorOutput())
             );
         }
 

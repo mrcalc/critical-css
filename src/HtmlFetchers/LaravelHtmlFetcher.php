@@ -3,6 +3,7 @@
 namespace Alfheim\CriticalCss\HtmlFetchers;
 
 use Closure;
+use Illuminate\Foundation\Testing\Concerns\MakesHttpRequests;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Http\Kernel as HttpKernel;
@@ -13,8 +14,11 @@ use Illuminate\Contracts\Http\Kernel as HttpKernel;
  */
 class LaravelHtmlFetcher implements HtmlFetcherInterface
 {
+    use MakesHttpRequests;
+
     /** @var \Illuminate\Contracts\Foundation\Application */
     protected $app = null;
+    protected $baseUrl = '';
 
     /**
      * Create a new instance.
@@ -33,7 +37,7 @@ class LaravelHtmlFetcher implements HtmlFetcherInterface
      */
     public function fetch($uri)
     {
-        $response = $this->call($uri);
+        $response = $this->call('GET', $uri);
 
         if (!$response->isOk()) {
 			
@@ -57,25 +61,5 @@ class LaravelHtmlFetcher implements HtmlFetcherInterface
     protected function stripCss($html)
     {
         return preg_replace('/\<style data-inlined\>.*\<\/style\>/s', '', $html);
-    }
-
-    /**
-     * Call the given URI and return a Response.
-     *
-     * @param  string $uri
-     *
-     * @return \Illuminate\Http\Response
-     */
-    protected function call($uri)
-    {
-        $request = Request::create($uri, 'GET');
-
-        $kernel = $this->app->make(HttpKernel::class);
-
-        $response = $kernel->handle($request);
-
-        $kernel->terminate($request, $response);
-
-        return $response;
     }
 }

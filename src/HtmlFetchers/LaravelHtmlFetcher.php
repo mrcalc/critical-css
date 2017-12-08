@@ -30,6 +30,7 @@ class LaravelHtmlFetcher implements HtmlFetcherInterface
     public function __construct(Closure $appMaker)
     {
         $this->app = $appMaker();
+		$this->baseUrl = config('app.url');
     }
 
     /**

@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\Concerns\MakesHttpRequests;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Http\Kernel as HttpKernel;
+use Illuminate\Support\Facades\Config;
 
 /**
  * This implementation fetches HTML for a given URI by mocking a Request and
@@ -30,7 +31,7 @@ class LaravelHtmlFetcher implements HtmlFetcherInterface
     public function __construct(Closure $appMaker)
     {
         $this->app = $appMaker();
-		$this->baseUrl = config('app.url');
+		$this->baseUrl = Config::get('app.url');
     }
 
     /**

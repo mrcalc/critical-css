@@ -2,7 +2,7 @@
 
 namespace Alfheim\CriticalCss\CssGenerators;
 
-use Symfony\Component\Process\ProcessBuilder;
+use Symfony\Component\Process\Process;
 use Alfheim\CriticalCss\Storage\StorageInterface;
 use Alfheim\CriticalCss\HtmlFetchers\HtmlFetcherInterface;
 
@@ -86,34 +86,37 @@ class CriticalGenerator implements CssGeneratorInterface
     {
         $html = $this->htmlFetcher->fetch($uri);
 
-        $builder = new ProcessBuilder;
-
-        $builder->setPrefix($this->criticalBin);
-
-        $builder->setArguments([
+        $processArgs = [
+            $this->criticalBin,
             '--base='.realpath(__DIR__.'/../.tmp'),
             '--width='.$this->width,
             '--height='.$this->height,
-            '--minify',
-        ]);
+            // Note: minify argument has been removed from puppeteer
+//            '--minify',
+        ];
 
-        if (!is_null($this->timeout)) {
-            $builder->setTimeout($this->timeout);
+        $hasTimeout = !is_null($this->timeout);
 
-            $builder->add('--timeout='.$this->timeout);
-        }
+        // Note: timeout argument has been removed from puppeteer
+//        if ($hasTimeout) {
+//            $processArgs[] = '--timeout='.$this->timeout;
+//        }
 
         foreach ($this->css as $css) {
-            $builder->add('--css='.$css);
+            $processArgs[] = '--css='.$css;
         }
 
         foreach ($this->ignore as $ignore) {
-            $builder->add('--ignore='.$ignore);
+            $processArgs[] = '--ignore='.$ignore;
         }
 
-        $builder->setInput($html);
+        $process = new Process($processArgs);
 
-        $process = $builder->getProcess();
+        if ($hasTimeout) {
+            $process->setTimeout($this->timeout);
+        }
+
+        $process->setInput($html);
 
         $process->run();
 

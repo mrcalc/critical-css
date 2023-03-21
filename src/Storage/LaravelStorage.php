@@ -69,18 +69,22 @@ class LaravelStorage implements StorageInterface
 
     /**
      * Wrap the critical-path CSS inside a '<style>' HTML element and return
-     * the HTML.
+     * the HTML. If nonce is provided, this is included in the style tag.
      *
      * @param  string $uri
+     * @param  string $nonce
      *
      * @return string
      */
-    public function css($uri)
+    public function css($uri, $nonce = null)
     {
         if ($this->pretend) {
             return '';
         }
 
+        if ($nonce) {
+            return '<style data-inlined nonce="'.$nonce.'">'.$this->readCss($uri).'</style>';
+        }
         return '<style data-inlined>'.$this->readCss($uri).'</style>';
     }
 
